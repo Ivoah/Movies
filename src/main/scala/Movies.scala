@@ -12,8 +12,8 @@ class Movies()(implicit val db: Connection) {
   private val rootRouter = Router {
     case ("GET", "/", request) => Response(Templates.root(
       "Noah's movie list",
-      MovieWatch.get(),
-      request.params.getOrElse("sort_by", "rating"),
+      Movie.getAll(),
+      request.params.getOrElse("sort_by", "latest_rating"),
       nav_back = false
     ))
   }
@@ -23,20 +23,18 @@ class Movies()(implicit val db: Connection) {
   }
   
   private val moviesRouter = Router {
-    case ("GET", s"/movies/$title", request) => Response(Templates.root(
+    case ("GET", s"/movies/$title", request) => Response(Templates.movie(
       title,
       MovieWatch.get(title = Some(title)),
-      request.params.getOrElse("sort_by", "date"),
-      nav_back = true
+//      request.params.getOrElse("sort_by", "date")
     ))
   }
   
   private val peopleRouter = Router {
-    case ("GET", s"/people/$name", request) => Response(Templates.root(
-      s"Movies watched with $name",
+    case ("GET", s"/people/$name", request) => Response(Templates.person(
+      name,
       MovieWatch.get(person = Some(name)),
-      request.params.getOrElse("sort_by", "date"),
-      nav_back = true
+//      request.params.getOrElse("sort_by", "date")
     ))
   }
   
