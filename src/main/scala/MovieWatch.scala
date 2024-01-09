@@ -9,7 +9,7 @@ case class MovieWatch(title: String, rating: Double, cried: Boolean, date: Date,
 
 object MovieWatch {
   def get(title: Option[String] = None, person: Option[String] = None)(implicit db: Connection): Seq[MovieWatch] = {
-    val order_by = "ORDER BY rating DESC, date ASC"
+    val order_by = "ORDER BY date DESC"
     Using.resource({
       if (title.nonEmpty) db.prepareStatement(s"SELECT * FROM movies WHERE title = ? $order_by")
       else if (person.nonEmpty) db.prepareStatement(s"SELECT * FROM movies WHERE LOCATE(?, watched_with) $order_by")
