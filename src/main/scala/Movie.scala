@@ -13,9 +13,9 @@ object Movie {
       """
         |SELECT
         |	title outer_title,
-        |	(SELECT rating FROM movies WHERE title=outer_title ORDER BY date DESC LIMIT 1) rating,
+        |	(SELECT rating FROM movies WHERE title=outer_title ORDER BY started DESC LIMIT 1) rating,
         |	BIT_OR(cried) cried,
-        |	max(date) last_watched,
+        |	max(started) last_watched,
         |	count(*) watch_count,
         |	IFNULL(GROUP_CONCAT(NULLIF(watched_with, '') SEPARATOR ', '), '') watched_with
         |FROM movies

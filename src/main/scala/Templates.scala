@@ -92,7 +92,7 @@ object Templates {
         ),
         for (watch <- watches) yield {
           tr(
-            td(dateFormatter.format(watch.date)),
+            td(dateFormatter.format(watch.started)),
             td(watch.rating),
             td(if (watch.cried) "✓" else "✗"),
             td(watch.watched_with.flatMap(name => Seq(a(href:=s"/people/${name.urlEncoded}", name), frag(", "))).dropRight(1))
@@ -121,7 +121,7 @@ object Templates {
         for (watch <- watches) yield {
           tr(
             td(a(watch.title, href:=s"/movies/${watch.title.urlEncoded}")),
-            td(dateFormatter.format(watch.date)),
+            td(dateFormatter.format(watch.started)),
             td(watch.rating),
             td(if (watch.cried) "✓" else "✗"),
             td(watch.watched_with.flatMap(name => Seq(a(href:=s"/people/${name.urlEncoded}", name), frag(", "))).dropRight(1))
