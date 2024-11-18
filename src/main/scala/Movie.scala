@@ -22,20 +22,17 @@ object Movie {
         |GROUP BY title
         |ORDER BY last_watched DESC
         |""".stripMargin)) { stmt =>
-      val results = stmt.executeQuery()
-      val buffer = mutable.Buffer[Movie]()
-      while (results.next()) {
-        buffer.append(Movie(
+      Iterator.unfold(stmt.executeQuery()) { results =>
+        if (results.next()) Some(Movie(
           results.getString("outer_title"),
           results.getDouble("rating"),
           results.getBoolean("cried"),
           results.getDate("last_watched"),
           results.getInt("watch_count"),
           results.getString("watched_with").split(", ").filter(_.nonEmpty).distinct
-        ))
-      }
-      buffer.toSeq
-
+        ), results)
+        else None
+      }.toSeq
     }
   }
 }

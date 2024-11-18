@@ -17,19 +17,17 @@ object MovieWatch {
     }) { stmt =>
       title.foreach(stmt.setString(1, _))
       person.foreach(stmt.setString(1, _))
-      val results = stmt.executeQuery()
-      val buffer = mutable.Buffer[MovieWatch]()
-      while (results.next()) {
-        buffer.append(MovieWatch(
+      Iterator.unfold(stmt.executeQuery()) { results =>
+        if (results.next()) Some(MovieWatch(
           results.getString("title"),
           results.getDouble("rating"),
           results.getBoolean("cried"),
           results.getDate("started"),
           results.getDate("finished"),
           results.getString("watched_with").split(", ").filter(_.nonEmpty)
-        ))
-      }
-      buffer.toSeq
+        ), results)
+        else None
+      }.toSeq
     }
   }
 }
