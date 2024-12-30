@@ -1,6 +1,7 @@
 package net.ivoah.movies
 
 import java.text.SimpleDateFormat
+import scala.math.Ordering.Implicits.seqOrdering
 import scalatags.Text.all._
 import scalatags.Text.tags2.title
 
@@ -50,8 +51,9 @@ object Templates {
       p(pluralize(movies.length, "result", "results")),
       table(
         thead(
-          tr(Seq("Title", "Latest rating", "Cried?", "Last watch", "Watch count", "Watched with").map { header =>
-            th(a(href:=s"?sort_by=${header.toLowerCase.replace(" ", "_").replace("?", "")}", header))
+          tr(Seq("Title", "Latest rating", "Cried?", "Last watch", "Watch count", "Watched with", "Location(s)").map { header =>
+            val sort_by = header.toLowerCase.replace(" ", "_").replace("?", "").replace("(", "").replace(")", "")
+            th(a(href:=s"?sort_by=$sort_by", header))
           })
         ),
         for (movie <- sort_by match {
@@ -61,6 +63,7 @@ object Templates {
           case "last_watch" => movies.sortBy(_.last_watched).reverse
           case "watch_count" => movies.sortBy(_.watch_count).reverse
           case "watched_with" => movies.sortBy(_.watched_with.length).reverse
+          case "locations" => movies.sortBy(_.locations.sorted)
           case _ => movies.sortBy(_.last_watched).reverse
         }) yield {
           tr(
@@ -69,54 +72,27 @@ object Templates {
             td(if (movie.cried) "✓" else "✗"),
             td(dateFormatter.format(movie.last_watched)),
             td(movie.watch_count),
-            td(movie.watched_with.flatMap(name => Seq(a(href:=s"/people/${name.urlEncoded}", name), frag(", "))).dropRight(1))
+            td(movie.watched_with.map(name => a(href:=s"/people/${name.urlEncoded}", name)).mkSeq(frag(", "))),
+            td(movie.locations.map(name => a(href:=s"/locations/${name.urlEncoded}", name)).mkSeq(frag(", "))),
           )
         }
       )
     )
   )
 
-  def movie(title: String, watches: Seq[MovieWatch]): String = doctype + html(
+  def movie(title: String, header: String, watches: Seq[MovieWatch]): String = doctype + html(
     head(
-      tag("title")(s"${watches.head.title}"),
+      tag("title")(title),
       link(rel:="icon", href:="/static/favicon.png"),
       link(rel:="stylesheet", href:="/static/style.css")
     ),
     body(
       a(`class`:="lnav", href:="/", "< all movies"),
-      h1(watches.head.title),
+      h1(header),
       p(pluralize(watches.length, "result", "results")),
       table(
         thead(
-          tr(Seq("Date", "Rating", "Cried?", "Watched with").map(h => th(h)))
-        ),
-        for (watch <- watches) yield {
-          tr(
-            td(dateFormatter.format(watch.started)),
-            td(watch.rating),
-            td(if (watch.cried) "✓" else "✗"),
-            td(watch.watched_with.flatMap(name => Seq(a(href:=s"/people/${name.urlEncoded}", name), frag(", "))).dropRight(1))
-          )
-        }
-      )
-
-    )
-  )
-  
-  // TODO: consolidate with Templates.movie
-  def person(name: String, watches: Seq[MovieWatch]): String = doctype + html(
-    head(
-      tag("title")(name),
-      link(rel:="icon", href:="/static/favicon.png"),
-      link(rel:="stylesheet", href:="/static/style.css")
-    ),
-    body(
-      a(`class`:="lnav", href:="/", "< all movies"),
-      h1(s"Movies watched with $name"),
-      p(pluralize(watches.length, "result", "results")),
-      table(
-        thead(
-          tr(Seq("Title", "Date", "Rating", "Cried?", "Watched with").map(h => th(h)))
+          tr(Seq("Title", "Date", "Rating", "Cried?", "Watched with", "Location").map(h => th(h)))
         ),
         for (watch <- watches) yield {
           tr(
@@ -124,7 +100,8 @@ object Templates {
             td(dateFormatter.format(watch.started)),
             td(watch.rating),
             td(if (watch.cried) "✓" else "✗"),
-            td(watch.watched_with.flatMap(name => Seq(a(href:=s"/people/${name.urlEncoded}", name), frag(", "))).dropRight(1))
+            td(watch.watched_with.map(name => a(href:=s"/people/${name.urlEncoded}", name)).mkSeq(frag(", "))),
+            td(a(href:=s"/locations/${watch.location.urlEncoded}", watch.location))
           )
         }
       )

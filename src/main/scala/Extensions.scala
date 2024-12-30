@@ -23,4 +23,8 @@ object Extensions {
       s"rgb(${md5.slice(0, 3).map(_ & 0xff).mkString(", ")})"
     }
   }
+  
+  extension[T] (seq: Seq[T]) {
+    def mkSeq(b: T): Seq[T] = seq.flatMap(a => Seq(a, b)).dropRight(1)
+  }
 }
