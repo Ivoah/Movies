@@ -101,7 +101,7 @@ object Templates {
             td(watch.rating),
             td(if (watch.cried) "✓" else "✗"),
             td(watch.watched_with.map(name => a(href:=s"/people/${name.urlEncoded}", name)).mkSeq(frag(", "))),
-            td(a(href:=s"/locations/${watch.location.urlEncoded}", watch.location))
+            td(watch.locations.map(location => a(href:=s"/locations/${location.urlEncoded}", location)).mkSeq(frag(", ")))
           )
         }
       )

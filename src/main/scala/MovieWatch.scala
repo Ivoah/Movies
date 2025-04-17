@@ -4,7 +4,7 @@ import java.sql.Connection
 import java.util.Date
 import scala.util.Using
 
-case class MovieWatch(title: String, rating: Double, cried: Boolean, started: Date, finished: Date, watched_with: Seq[String], location: String)
+case class MovieWatch(title: String, rating: Double, cried: Boolean, started: Date, finished: Date, watched_with: Seq[String], locations: Seq[String])
 
 object MovieWatch {
   def get(title: Option[String] = None, person: Option[String] = None, location: Option[String] = None)(implicit db: Connection): Seq[MovieWatch] = {
@@ -26,7 +26,7 @@ object MovieWatch {
           results.getDate("started"),
           results.getDate("finished"),
           results.getString("watched_with").split(", ").filter(_.nonEmpty),
-          results.getString("location")
+          results.getString("location").split(", ").filter(_.nonEmpty)
         ), results)
         else None
       }.toSeq
