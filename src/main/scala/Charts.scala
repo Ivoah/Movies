@@ -1,6 +1,7 @@
 package net.ivoah.movies
 
 import scalatags.Text.all.*
+import scalatags.Text.tags2.title
 
 import java.util.UUID
 
@@ -42,6 +43,7 @@ object Charts {
           for (y <- 0 to yMax by (yMax/7)) yield line(x1:=0, y1:=yScale(y), x2:=_width, y2:=yScale(y), stroke:="currentColor", strokeOpacity:=0.2),
           for ((d, m) <- bins) yield g(transform:=s"translate(${xScale(d) + barWidth/2.0}, 0)", textAnchor:="end",
             a(linkMapper(d).map(l => href:=l),
+              title(m),
               line(y1:=yScale(0), y2:=yScale(m), stroke:="black", strokeWidth:=barWidth),
               text(dominantBaseline:="middle", transform:=s"translate(0, ${yScale(0) + 3}) rotate(-90)", d.toString)
             )
