@@ -48,6 +48,10 @@ object Templates {
     body(
       if (nav_back) a(`class`:="lnav", href:="/", "< all movies") else frag(),
       h1(_title),
+      Charts.histogram(
+        (0 to 100) map (n => BigDecimal(n/10.0)) map (n => n -> movies.count(_.rating == n)),
+        n => Some(s"/?sort_by=latest_rating#$n")
+      ),
       p(pluralize(movies.length, "result", "results")),
       table(
         thead(
@@ -56,25 +60,30 @@ object Templates {
             th(a(href:=s"?sort_by=$sort_by", header))
           })
         ),
-        for (movie <- sort_by match {
-          case "title" => movies.sortBy(_.title)
-          case "latest_rating" => movies.sortBy(_.rating).reverse
-          case "cried" => movies.sortBy(!_.cried)
-          case "last_watch" => movies.sortBy(_.last_watched).reverse
-          case "watch_count" => movies.sortBy(_.watch_count).reverse
-          case "watched_with" => movies.sortBy(_.watched_with.length).reverse
-          case "locations" => movies.sortBy(_.locations.sorted)
-          case _ => movies.sortBy(_.last_watched).reverse
-        }) yield {
-          tr(
-            td(a(href:=s"/movies/${movie.title.urlEncoded}", movie.title)),
-            td(movie.rating),
-            td(if (movie.cried) "✓" else "✗"),
-            td(dateFormatter.format(movie.last_watched)),
-            td(movie.watch_count),
-            td(movie.watched_with.map(name => a(href:=s"/people/${name.urlEncoded}", name)).mkSeq(frag(", "))),
-            td(movie.locations.map(name => a(href:=s"/locations/${name.urlEncoded}", name)).mkSeq(frag(", "))),
-          )
+        {
+          var lastRating = BigDecimal(-1)
+          for (movie <- sort_by match {
+            case "title" => movies.sortBy(_.title)
+            case "latest_rating" => movies.sortBy(_.rating).reverse
+            case "cried" => movies.sortBy(!_.cried)
+            case "last_watch" => movies.sortBy(_.last_watched).reverse
+            case "watch_count" => movies.sortBy(_.watch_count).reverse
+            case "watched_with" => movies.sortBy(_.watched_with.length).reverse
+            case "locations" => movies.sortBy(_.locations.sorted)
+            case _ => movies.sortBy(_.last_watched).reverse
+          }) yield {
+            val row = tr(if (movie.rating != lastRating) id:=movie.rating.toString else frag(),
+              td(a(href := s"/movies/${movie.title.urlEncoded}", movie.title)),
+              td(movie.rating.toString),
+              td(if (movie.cried) "✓" else "✗"),
+              td(dateFormatter.format(movie.last_watched)),
+              td(movie.watch_count),
+              td(movie.watched_with.map(name => a(href := s"/people/${name.urlEncoded}", name)).mkSeq(frag(", "))),
+              td(movie.locations.map(name => a(href := s"/locations/${name.urlEncoded}", name)).mkSeq(frag(", "))),
+            )
+            lastRating = movie.rating
+            row
+          }
         }
       )
     )
@@ -98,7 +107,7 @@ object Templates {
           tr(
             td(a(watch.title, href:=s"/movies/${watch.title.urlEncoded}")),
             td(dateFormatter.format(watch.started)),
-            td(watch.rating),
+            td(watch.rating.toString),
             td(if (watch.cried) "✓" else "✗"),
             td(watch.watched_with.map(name => a(href:=s"/people/${name.urlEncoded}", name)).mkSeq(frag(", "))),
             td(watch.locations.map(location => a(href:=s"/locations/${location.urlEncoded}", location)).mkSeq(frag(", ")))

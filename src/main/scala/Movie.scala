@@ -4,7 +4,7 @@ import java.sql.Connection
 import java.util.Date
 import scala.util.Using
 
-case class Movie(title: String, rating: Double, cried: Boolean, last_watched: Date, watch_count: Int, watched_with: Seq[String], locations: Seq[String])
+case class Movie(title: String, rating: BigDecimal, cried: Boolean, last_watched: Date, watch_count: Int, watched_with: Seq[String], locations: Seq[String])
 
 object Movie {
   def getAll()(implicit db: Connection): Seq[Movie] = {
@@ -25,7 +25,7 @@ object Movie {
       Iterator.unfold(stmt.executeQuery()) { results =>
         if (results.next()) Some(Movie(
           results.getString("outer_title"),
-          results.getDouble("rating"),
+          results.getBigDecimal("rating"),
           results.getBoolean("cried"),
           results.getDate("last_watched"),
           results.getInt("watch_count"),
