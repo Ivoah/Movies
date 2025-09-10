@@ -17,7 +17,7 @@ lazy val root = (project in file("."))
     idePackagePrefix := Some("net.ivoah.movies"),
     libraryDependencies ++= Seq(
       "net.ivoah" %% "vial" % "0.3.3",
-      "mysql" % "mysql-connector-java" % "8.0.28",
+      "mysql" % "mysql-connector-java" % "8.0.33",
       // "org.commonmark" % "commonmark" % "0.19.0",
       // "org.commonmark" % "commonmark-ext-gfm-strikethrough" % "0.19.0",
       "com.lihaoyi" %% "scalatags" % "0.12.0",

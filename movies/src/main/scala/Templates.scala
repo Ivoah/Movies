@@ -2,10 +2,10 @@ package net.ivoah.movies
 
 import java.text.SimpleDateFormat
 import scala.math.Ordering.Implicits.seqOrdering
-import scalatags.Text.all._
+import scalatags.Text.all.*
 import scalatags.Text.tags2.title
 
-import Extensions._
+import Extensions.*
 
 object Templates {
   private val doctype = "<!DOCTYPE html>\n"
@@ -43,7 +43,8 @@ object Templates {
     head(
       title(_title),
       link(rel:="icon", href:="/static/favicon.png"),
-      link(rel:="stylesheet", href:="/static/style.css")
+      link(rel:="stylesheet", href:="/static/style.css"),
+      script(src:="/static/search.js")
     ),
     body(
       if (nav_back) a(`class`:="lnav", href:="/", "< all movies") else frag(),
@@ -52,8 +53,9 @@ object Templates {
         (0 to 100) map (n => BigDecimal(n/10.0)) map (n => n -> movies.count(_.rating == n)),
         n => Some(s"/?sort_by=latest_rating#$n")
       ),
+      input(`type`:="text", id:="search", style:="width: 100%", oninput:="search(this.value)"),
       p(pluralize(movies.length, "result", "results")),
-      table(
+      table(id:="movies",
         thead(
           tr(Seq("Title", "Latest rating", "Cried?", "Last watch", "Watch count", "Watched with", "Location(s)").map { header =>
             val sort_by = header.toLowerCase.replace(" ", "_").replace("?", "").replace("(", "").replace(")", "")

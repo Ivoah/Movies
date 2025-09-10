@@ -1,0 +1,10 @@
+function search(query) {
+  const pattern = new RegExp(query, "i");
+  for (const row of document.querySelectorAll("#movies tr")) {
+    if (pattern.test(row.querySelector("a").text)) {
+      row.style.display = "";
+    } else {
+      row.style.display = "none";
+    }
+  }
+}

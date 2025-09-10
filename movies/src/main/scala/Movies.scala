@@ -1,8 +1,8 @@
 package net.ivoah.movies
 
 import java.sql.Connection
-import java.nio.file._
-import net.ivoah.vial._
+import java.nio.file.*
+import net.ivoah.vial.*
 
 class Movies()(implicit val db: Connection) {
 //  private def person(name: String): String = {
