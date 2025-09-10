@@ -11,7 +11,7 @@ ThisBuild / assemblyMergeStrategy := {
     oldStrategy(x)
 }
 
-lazy val root = (project in file("."))
+lazy val root = (project in file("movies"))
   .settings(
     name := "movies",
     idePackagePrefix := Some("net.ivoah.movies"),
