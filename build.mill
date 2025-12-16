@@ -3,7 +3,7 @@
 package build
 import mill.*, scalalib.*
 
-object movies extends SbtModule {
+object `package` extends ScalaModule {
   def scalaVersion = "3.3.6"
   def mvnDeps = Seq(
     mvn"net.ivoah::vial:0.3.3",
