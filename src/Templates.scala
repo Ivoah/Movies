@@ -50,7 +50,7 @@ object Templates {
       if (nav_back) a(`class`:="lnav", href:="/", "< all movies") else frag(),
       h1(_title),
       Charts.histogram(
-        (0 to 100) map (n => BigDecimal(n/10.0)) map (n => n -> movies.count(_.rating == n)),
+        (0 to 100) map (_/10.0) map (n => n -> movies.count(m => n <= m.rating && m.rating < (n + 0.1))),
         n => Some(s"/?sort_by=latest_rating#$n")
       ),
       input(`type`:="text", id:="search", style:="width: 100%", oninput:="search(this.value)"),
@@ -63,7 +63,7 @@ object Templates {
           })
         ),
         {
-          var lastRating = BigDecimal(-1)
+          var lastRating = -1.0
           for (movie <- sort_by match {
             case "title" => movies.sortBy(_.title)
             case "latest_rating" => movies.sortBy(_.rating).reverse
